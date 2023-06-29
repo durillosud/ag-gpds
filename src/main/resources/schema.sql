@@ -1,8 +1,22 @@
 create schema if not exists ag_cap_gpds;
 
+
+create table if not exists ag_cap_gpds.status
+(
+    id        bigserial  not null
+    constraint status_pk
+    primary key,
+    descricao varchar not null
+);
+
+alter table ag_cap_gpds.status
+    owner to gpds;
+
+comment on table ag_cap_gpds.status is 'Contém status de projetos e atividades de projetos';
+
 create table if not exists ag_cap_gpds.clientes
 (
-    id   bigint  not null
+    id   bigserial  not null
         constraint clientes_pk
             primary key,
     nome varchar not null
@@ -15,7 +29,7 @@ alter table ag_cap_gpds.clientes
 
 create table if not exists ag_cap_gpds.projetos
 (
-    id        bigint  not null
+    id        bigserial  not null
         constraint projetos_pk
             primary key,
     descricao varchar not null,
@@ -34,7 +48,7 @@ alter table ag_cap_gpds.projetos
 
 create table if not exists ag_cap_gpds.atividades
 (
-    id          bigint  not null
+    id          bigserial  not null
         constraint atividades_pk
             primary key,
     descricao   varchar not null,
@@ -50,17 +64,6 @@ create table if not exists ag_cap_gpds.atividades
 comment on table ag_cap_gpds.atividades is 'Contém atividades de projetos';
 
 alter table ag_cap_gpds.atividades
-    owner to gpds;
-
-create table if not exists ag_cap_gpds.status
-(
-    id        bigint  not null
-        constraint status_pk
-            primary key,
-    descricao varchar not null
-);
-
-alter table ag_cap_gpds.status
     owner to gpds;
 
 insert into ag_cap_gpds.status (id, descricao)

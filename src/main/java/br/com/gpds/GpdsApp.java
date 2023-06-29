@@ -27,6 +27,8 @@ import tech.jhipster.config.JHipsterConstants;
 public class GpdsApp {
 
     private static final Logger log = LoggerFactory.getLogger(GpdsApp.class);
+    public static final String INDEX_HTML = "public/index.html";
+    public static String hostAddress;
 
     private final Environment env;
 
@@ -43,6 +45,13 @@ public class GpdsApp {
      */
     @PostConstruct
     public void initApplication() {
+        hostAddress = "localhost";
+        try {
+            hostAddress = InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            log.warn("The host name could not be determined, using `localhost` as fallback");
+        }
+
         Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
         if (
             activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) &&
@@ -100,11 +109,11 @@ public class GpdsApp {
             env.getProperty("spring.application.name"),
             protocol,
             serverPort,
-            contextPath,
+            contextPath.concat(INDEX_HTML),
             protocol,
             hostAddress,
             serverPort,
-            contextPath,
+            contextPath.concat(INDEX_HTML),
             env.getActiveProfiles().length == 0 ? env.getDefaultProfiles() : env.getActiveProfiles()
         );
     }

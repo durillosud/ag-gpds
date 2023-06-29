@@ -99,5 +99,7 @@ jhipster:
 # More documentation is available at:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
-
+springdoc:
+  swagger-ui:
+    url: http://localhost:${server.port}/v3/api-docs
 # application:

@@ -1,6 +1,8 @@
 package br.com.gpds.config;
 
 import br.com.gpds.security.*;
+import br.com.gpds.security.jwt.JWTConfigurer;
+import br.com.gpds.security.jwt.TokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,14 +21,26 @@ import tech.jhipster.config.JHipsterProperties;
 public class SecurityConfiguration {
 
     private final JHipsterProperties jHipsterProperties;
+    private final TokenProvider tokenProvider;
 
-    public SecurityConfiguration(JHipsterProperties jHipsterProperties) {
+    public SecurityConfiguration(JHipsterProperties jHipsterProperties, TokenProvider tokenProvider) {
         this.jHipsterProperties = jHipsterProperties;
+        this.tokenProvider = tokenProvider;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // @formatter:off
         http
+            // Liberadas URLs de acesso à documentação de API apenas por conveniência para demonstração
+            .authorizeHttpRequests(authHR ->
+                authHR
+                    .requestMatchers("/public/index.html").permitAll()
+                    .requestMatchers("/swagger-ui/**").permitAll()
+                    .requestMatchers("/error/**").permitAll()
+                    .requestMatchers("/v3/api-docs/**").permitAll()
+            )
+            // @Todo: Descartar código acima e aplicar política de segurança para documentação de API
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz ->
                 // prettier-ignore
@@ -35,7 +49,7 @@ public class SecurityConfiguration {
                     .requestMatchers(HttpMethod.GET, "/api/authenticate").permitAll()
                     .requestMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers("/api/**").authenticated()
-                    .requestMatchers("/v3/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)
+//                    .requestMatchers("/v3/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers("/management/health").permitAll()
                     .requestMatchers("/management/health/**").permitAll()
                     .requestMatchers("/management/info").permitAll()
@@ -48,7 +62,12 @@ public class SecurityConfiguration {
                     .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
                     .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
             )
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt());
+            .apply(securityConfigurerAdapter());
         return http.build();
+        // @formatter:on
+    }
+
+    private JWTConfigurer securityConfigurerAdapter() {
+        return new JWTConfigurer(tokenProvider);
     }
 }
