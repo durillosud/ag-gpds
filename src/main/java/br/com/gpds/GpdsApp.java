@@ -23,8 +23,7 @@ import tech.jhipster.config.DefaultProfileUtil;
 import tech.jhipster.config.JHipsterConstants;
 
 @SpringBootApplication
-//@EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class })
-@EnableConfigurationProperties({ ApplicationProperties.class })
+@EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class })
 public class GpdsApp {
 
     private static final Logger log = LoggerFactory.getLogger(GpdsApp.class);
@@ -59,22 +58,6 @@ public class GpdsApp {
         ) {
             log.error(
                 "You have misconfigured your application! It should not " + "run with both the 'dev' and 'cloud' profiles at the same time."
-            );
-        }
-
-        if (
-            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT)
-        ) {
-            var cmd = """
-                docker container -f ../docker/app.yml up
-                """;
-            try {
-                Runtime.getRuntime().exec(cmd);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            log.error(
-                "DB seeding was ran out."
             );
         }
     }

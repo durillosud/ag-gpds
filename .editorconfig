@@ -19,5 +19,8 @@ indent_size = 4
 [*.{ts,tsx,js,jsx,json,css,scss,yml,html,vue}]
 indent_size = 2
 
+[*.{makefile}]
+indent_size = tab
+
 [*.md]
 trim_trailing_whitespace = false

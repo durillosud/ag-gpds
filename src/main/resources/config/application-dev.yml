@@ -55,7 +55,7 @@ spring:
     cache: false
   sql:
     init:
-      mode: embedded
+      mode: always
 
 server:
   port: 10000

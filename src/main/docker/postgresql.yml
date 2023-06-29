@@ -2,11 +2,9 @@
 name: gpds
 services:
   postgresql:
-    image: postgres:15.3
-    # volumes:
-    #   - ~/volumes/jhipster/GPDS/postgresql/:/var/lib/postgresql/data/
+    image: postgres:15.3-alpine3.18
     volumes:
-      - pg-data:/var/lib/postgresql/data/
+      - ~/volumes/GPDS/postgresql/:/var/lib/postgresql/data/
     environment:
       POSTGRES_USER: gpds
       POSTGRES_DB: GPDS
@@ -21,6 +19,3 @@ services:
     # remove the "127.0.0.1:" prefix
     ports:
       - 127.0.0.1:5432:5432
-
-volumes:
-  pg-data:
