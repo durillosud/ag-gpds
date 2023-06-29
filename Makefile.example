@@ -1,3 +1,8 @@
+BIN_DIR = bin
+PROTO_DIR = proto
+SERVER_DIR = server
+CLIENT_DIR = client
+
 ifeq ($(OS), Windows_NT)
 	SHELL := powershell.exe
 	.SHELLFLAGS := -NoProfile -Command
@@ -10,7 +15,6 @@ ifeq ($(OS), Windows_NT)
 	RM_RF_CMD = ${RM_F_CMD} -Recurse
 	SERVER_BIN = ${SERVER_DIR}.exe
 	CLIENT_BIN = ${CLIENT_DIR}.exe
-	DOCKER_COMPOSE = docker-compose.exe
 else
 	SHELL := bash
 	SHELL_VERSION = $(shell echo $$BASH_VERSION)
@@ -30,15 +34,55 @@ else
 	RM_RF_CMD = ${RM_F_CMD} -r
 	SERVER_BIN = ${SERVER_DIR}
 	CLIENT_BIN = ${CLIENT_DIR}
-	DOCKER_COMPOSE = docker-compose
 endif
 
-start-db:
-	$(DOCKER_COMPOSE) -f ./src/main/docker/postgresql.yml up
+.DEFAULT_GOAL := help
+.PHONY: greet blog calculator help
+project := greet calculator blog
 
+all: $(project) ## Generate Pbs and build
 
-stop-db:
-	$(DOCKER_COMPOSE) -f ./src/main/docker/postgresql.yml down
+greet: $@ ## Generate Pbs and build for greet
+calculator: $@ ## Generate Pbs and build for calculator
+blog: $@ ## Generate Pbs and build for blog
 
+$(project):
+	@${CHECK_DIR_CMD}
+	protoc -I$@/${PROTO_DIR} --go_opt=module=${PACKAGE} --go_out=. --go-grpc_opt=module=${PACKAGE} --go-grpc_out=. $@/${PROTO_DIR}/*.proto
+	go build -o ${BIN_DIR}/$@/${SERVER_BIN} ./$@/${SERVER_DIR}
+	go build -o ${BIN_DIR}/$@/${CLIENT_BIN} ./$@/${CLIENT_DIR}
 
-.PHONY: start-db stop-db
+test: all ## Launch tests
+	go test ./...
+
+clean: clean_greet clean_calculator clean_blog ## Clean generated files
+	${RM_F_CMD} ssl/*.crt
+	${RM_F_CMD} ssl/*.csr
+	${RM_F_CMD} ssl/*.key
+	${RM_F_CMD} ssl/*.pem
+	${RM_RF_CMD} ${BIN_DIR}
+
+clean_greet: ## Clean generated files for greet
+	${RM_F_CMD} greet/${PROTO_DIR}/*.pb.go
+
+clean_calculator: ## Clean generated files for calculator
+	${RM_F_CMD} calculator/${PROTO_DIR}/*.pb.go
+
+clean_blog: ## Clean generated files for blog
+	${RM_F_CMD} blog/${PROTO_DIR}/*.pb.go
+
+rebuild: clean all ## Rebuild the whole project
+
+bump: all ## Update packages version
+	go get -u ./...
+
+about: ## Display info related to the build
+	@echo "OS: ${OS}"
+	@echo "Shell: ${SHELL} ${SHELL_VERSION}"
+	@echo "Protoc version: $(shell protoc --version)"
+	@echo "Go version: $(shell go version)"
+	@echo "Go package: ${PACKAGE}"
+	@echo "Openssl version: $(shell openssl version)"
+
+help: ## Show this help
+	@${HELP_CMD}
