@@ -11,20 +11,20 @@ public class StatusEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
-    private long id;
+    private Long id;
     @Basic
     @Column(name = "descricao")
     private String descricao;
     @OneToMany(mappedBy = "status")
     private Collection<AtividadesEntity> atividades;
     @OneToMany(mappedBy = "status")
-    private Collection<ProjetosEntity> projetosById;
+    private Collection<ProjetosEntity> projetos;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -41,7 +41,7 @@ public class StatusEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StatusEntity that = (StatusEntity) o;
-        return id == that.id && Objects.equals(descricao, that.descricao);
+        return Objects.equals(id, that.id) && Objects.equals(descricao, that.descricao);
     }
 
     @Override
@@ -57,11 +57,11 @@ public class StatusEntity {
         this.atividades = atividades;
     }
 
-    public Collection<ProjetosEntity> getProjetosById() {
-        return projetosById;
+    public Collection<ProjetosEntity> getProjetos() {
+        return projetos;
     }
 
-    public void setProjetosById(Collection<ProjetosEntity> projetosById) {
-        this.projetosById = projetosById;
+    public void setProjetos(Collection<ProjetosEntity> projetos) {
+        this.projetos = projetos;
     }
 }

@@ -2,7 +2,6 @@ package br.com.gpds.domain;
 
 import jakarta.persistence.*;
 
-import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -11,24 +10,22 @@ public class ProjetosEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
-    private Long id;
+    private long id;
     @Basic
     @Column(name = "descricao")
     private String descricao;
-    @OneToMany(mappedBy = "projeto")
-    private Collection<AtividadesEntity> atividades;
-    @ManyToOne
-    @JoinColumn(name = "cliente", referencedColumnName = "id")
-    private ClientesEntity cliente;
     @ManyToOne
     @JoinColumn(name = "status", referencedColumnName = "id")
     private StatusEntity status;
+    @ManyToOne
+    @JoinColumn(name = "time", referencedColumnName = "id", nullable = false)
+    private TimeEntity time;
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -45,28 +42,12 @@ public class ProjetosEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProjetosEntity that = (ProjetosEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(descricao, that.descricao);
+        return id == that.id && Objects.equals(descricao, that.descricao);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, descricao);
-    }
-
-    public Collection<AtividadesEntity> getAtividades() {
-        return atividades;
-    }
-
-    public void setAtividades(Collection<AtividadesEntity> atividades) {
-        this.atividades = atividades;
-    }
-
-    public ClientesEntity getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(ClientesEntity cliente) {
-        this.cliente = cliente;
     }
 
     public StatusEntity getStatus() {
@@ -75,5 +56,13 @@ public class ProjetosEntity {
 
     public void setStatus(StatusEntity status) {
         this.status = status;
+    }
+
+    public TimeEntity getTime() {
+        return time;
+    }
+
+    public void setTime(TimeEntity time) {
+        this.time = time;
     }
 }

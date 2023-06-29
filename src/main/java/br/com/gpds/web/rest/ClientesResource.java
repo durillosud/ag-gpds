@@ -2,7 +2,7 @@ package br.com.gpds.web.rest;
 
 
 import br.com.gpds.domain.ClientesEntity;
-import br.com.gpds.domain.DomainConstants;
+import br.com.gpds.domain.common.DomainConstants;
 import br.com.gpds.web.rest.errors.BadRequestAlertException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

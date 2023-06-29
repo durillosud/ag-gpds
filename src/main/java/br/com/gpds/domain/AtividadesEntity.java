@@ -19,9 +19,6 @@ public class AtividadesEntity {
     @Column(name = "percentagem")
     private BigDecimal percentagem;
     @ManyToOne
-    @JoinColumn(name = "projeto", referencedColumnName = "id")
-    private ProjetosEntity projeto;
-    @ManyToOne
     @JoinColumn(name = "status", referencedColumnName = "id")
     private StatusEntity status;
 
@@ -60,14 +57,6 @@ public class AtividadesEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, descricao, percentagem);
-    }
-
-    public ProjetosEntity getProjeto() {
-        return projeto;
-    }
-
-    public void setProjeto(ProjetosEntity projeto) {
-        this.projeto = projeto;
     }
 
     public StatusEntity getStatus() {

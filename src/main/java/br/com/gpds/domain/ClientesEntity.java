@@ -2,7 +2,6 @@ package br.com.gpds.domain;
 
 import jakarta.persistence.*;
 
-import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -15,8 +14,6 @@ public class ClientesEntity {
     @Basic
     @Column(name = "nome")
     private String nome;
-    @OneToMany(mappedBy = "cliente")
-    private Collection<ProjetosEntity> projetos;
 
     public Long getId() {
         return id;
@@ -45,13 +42,5 @@ public class ClientesEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id, nome);
-    }
-
-    public Collection<ProjetosEntity> getProjetos() {
-        return projetos;
-    }
-
-    public void setProjetos(Collection<ProjetosEntity> projetos) {
-        this.projetos = projetos;
     }
 }
