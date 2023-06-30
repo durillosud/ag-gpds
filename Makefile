@@ -1,3 +1,9 @@
+# https://www.gnu.org/prep/standards/html_node/Makefile-Basics.html#Makefile-Basics
+
+SHELL = /bin/sh
+.SUFFIXES: #
+.DEFAULT_GOAL := help
+
 ifeq ($(OS), Windows_NT)
 	SHELL := powershell.exe
 	.SHELLFLAGS := -NoProfile -Command
@@ -36,9 +42,7 @@ endif
 start-db:
 	$(DOCKER_COMPOSE) -f ./src/main/docker/postgresql.yml up
 
-
 stop-db:
 	$(DOCKER_COMPOSE) -f ./src/main/docker/postgresql.yml down
 
-
-.PHONY: start-db stop-db
+.PHONY: *

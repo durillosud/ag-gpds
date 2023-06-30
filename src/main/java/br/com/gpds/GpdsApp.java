@@ -60,22 +60,20 @@ public class GpdsApp {
             activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) &&
                 activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_PRODUCTION)
         ) {
-            log.error(
+            log.error("""
+                You have misconfigured your application! It should not run
+                with both the 'dev' and 'prod' profiles at the same time.
                 """
-                    You have misconfigured your application! It should not run
-                    with both the 'dev' and 'prod' profiles at the same time.
-                    """
             );
         }
         if (
             activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) &&
                 activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_CLOUD)
         ) {
-            log.error(
+            log.error("""
+                You have misconfigured your application! It should not run
+                with both the 'dev' and 'cloud' profiles at the same time.
                 """
-                    You have misconfigured your application! It should not run
-                    with both the 'dev' and 'cloud' profiles at the same time.
-                    """
             );
         }
     }

@@ -1,3 +1,13 @@
+drop table if exists ag_cap_gpds.atividade_projeto_cliente;
+drop table if exists ag_cap_gpds.atividades;
+drop table if exists ag_cap_gpds.clientes;
+drop table if exists ag_cap_gpds.projetos;
+drop table if exists ag_cap_gpds.time;
+drop table if exists ag_cap_gpds.status;
+
+drop schema if exists ag_cap_gpds;
+
+--==========kkk The command bellow'll run always, sorry for that======
 create schema if not exists ag_cap_gpds;
 
 create table if not exists ag_cap_gpds.clientes
@@ -100,12 +110,13 @@ insert into ag_cap_gpds.status (id, descricao)
 values (default, 'Em análise'),
        (default, 'Em implementação'),
        (default, 'Em implantação'),
-       (default, 'Em suporte');
+       (default, 'Em suporte'),
+       (default, 'Finalizado');
 
 insert into ag_cap_gpds.time (nome, id)
-values  ('Time 1', default),
-        ('Time 2', default),
-        ('Time 3', default);
+values ('Time 1', default),
+       ('Time 2', default),
+       ('Time 3', default);
 --============================================================
 --
 -- create schema if not exists ag_cap_gpds;
