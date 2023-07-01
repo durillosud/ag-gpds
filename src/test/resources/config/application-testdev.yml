@@ -15,6 +15,9 @@ spring:
       auto-commit: false
       poolName: Hikari
       maximum-pool-size: 1
+    url: jdbc:h2:mem:GPDS;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS ag_cap_gpds
+    username: sa
+    password:
   jpa:
     open-in-view: false
     hibernate:
@@ -32,3 +35,4 @@ spring:
       hibernate.type.preferred_instant_jdbc_type: TIMESTAMP
       hibernate.jdbc.time_zone: UTC
       hibernate.query.fail_on_pagination_over_collection_fetch: true
+    show-sql: true

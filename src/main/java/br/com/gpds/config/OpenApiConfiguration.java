@@ -1,6 +1,9 @@
 package br.com.gpds.config;
 
 import br.com.gpds.GpdsApp;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -23,6 +26,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Configuration
 @Profile(JHipsterConstants.SPRING_PROFILE_API_DOCS)
+@SecuritySchemes({@SecurityScheme(type = SecuritySchemeType.HTTP, name = "bearerAuth", bearerFormat = "JWT", scheme = "bearer")})
 public class OpenApiConfiguration {
 
     public static final String API_FIRST_PACKAGE = "br.com.gpds.web.api";

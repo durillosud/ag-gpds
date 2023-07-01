@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 @Entity
-@Table(name = "status", schema = "ag_cap_gpds", catalog = "GPDS")
+@Table(name = "status", schema = "ag_cap_gpds")
 public class StatusEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

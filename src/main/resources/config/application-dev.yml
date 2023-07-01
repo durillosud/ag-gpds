@@ -12,7 +12,6 @@
 # Full reference is available at:
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
-
 logging:
   level:
     ROOT: DEBUG
@@ -56,6 +55,8 @@ spring:
   sql:
     init:
       mode: always
+  jpa:
+    show-sql: true
 
 server:
   port: 10000

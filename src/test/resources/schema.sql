@@ -114,18 +114,6 @@ insert into ag_cap_gpds.time (nome, id)
 values ('Time 1', default),
        ('Time 2', default),
        ('Time 3', default);
-
-
--- Sample data
-
-insert into ag_cap_gpds.clientes (nome)
-values  ('Manuel Julio Kevin Oliveira'),
-        ('Giovana Betina da Mata'),
-        ('Cláudia Stella Teixeira'),
-        ('Bianca Natália Bárbara da Rocha'),
-        ('Natália Jaqueline Silva'),
-        ('Marcos Anderson Elias Teixeira'),
-        ('Arthur Guilherme dos Santos');
 --============================================================
 --
 -- create schema if not exists ag_cap_gpds;

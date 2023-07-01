@@ -1,19 +1,32 @@
 package br.com.gpds.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.util.Objects;
 
 @Entity
-@Table(name = "clientes", schema = "ag_cap_gpds", catalog = "GPDS")
+@Table(name = "clientes", schema = "ag_cap_gpds")
 public class ClientesEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long id;
     @Basic
     @Column(name = "nome")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("name")
     private String nome;
+
+    public ClientesEntity() {
+    }
+
+    public ClientesEntity(Long id, String nome) {
+        this.id = id;
+        this.nome = nome;
+    }
 
     public Long getId() {
         return id;

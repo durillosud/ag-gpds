@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 @Entity
-@Table(name = "time", schema = "ag_cap_gpds", catalog = "GPDS")
+@Table(name = "time", schema = "ag_cap_gpds")
 public class TimeEntity {
     @Basic
     @Column(name = "nome")
