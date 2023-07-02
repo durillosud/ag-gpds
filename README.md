@@ -7,6 +7,8 @@ This application is configured for Service Discovery and Configuration with . On
 
 ## Getting Started
 
+**Importante: lembre-se de startar o postgres antes de rodar a aplicação.**
+
 Para iniciar o banco de dados PostgreSql rode o comando.
 
 ```shell
@@ -18,6 +20,15 @@ Para parar o container do DB.
 ```shell
 make stop-db
 ```
+
+**Links importantes:**
+
+[Home Pública]()
+
+[Swagger UI]()
+
+Troque o IP 0.0.0.0:10000 por localhost:10000 no campo de pesquisa da Swagger UI.
+
 
 ## Project Structure
 
@@ -192,3 +203,5 @@ To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`)
 [OpenAPI-Generator]: https://openapi-generator.tech
 [Swagger-Editor]: https://editor.swagger.io
 [Doing API-First development]: https://www.jhipster.tech/documentation-archive/v8.0.0-beta.1/doing-api-first-development/
+[Home Pública]: http://localhost:10000/public/index.html
+[Swagger UI]: http://localhost:10000/swagger-ui/index.html
