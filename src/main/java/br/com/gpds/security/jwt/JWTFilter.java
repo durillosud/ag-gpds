@@ -1,15 +1,20 @@
 package br.com.gpds.security.jwt;
 
+import br.com.gpds.management.SecurityMetersService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.*;
-import org.springframework.security.core.*;
-import org.springframework.security.core.context.*;
-import org.springframework.web.filter.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -24,11 +29,17 @@ public class JWTFilter extends GenericFilterBean {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String SESSION_KEY = "X-SessionKey";
 
-    private final TokenProvider tokenProvider;
-    private static volatile String jwt;
+    private final JwtDecoder jwtDecoder;
+    private final SecurityMetersService metersService;
+    private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
-    public JWTFilter(TokenProvider tokenProvider) {
-        this.tokenProvider = tokenProvider;
+    public JWTFilter(
+        JwtDecoder jwtDecoder, SecurityMetersService metersService,
+        JwtAuthenticationConverter jwtAuthenticationConverter
+    ) {
+        this.jwtDecoder = jwtDecoder;
+        this.metersService = metersService;
+        this.jwtAuthenticationConverter = jwtAuthenticationConverter;
     }
 
     @Override
@@ -39,15 +50,43 @@ public class JWTFilter extends GenericFilterBean {
 
         if (checkedHttpOptionsHeaderFromRequest(httpServletRequest)) {
             httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-            httpServletRequest.getRequestDispatcher(httpServletRequest.getServletPath()).forward(httpServletRequest, httpServletResponse);
+            httpServletRequest
+                .getRequestDispatcher(httpServletRequest.getServletPath())
+                .forward(httpServletRequest, httpServletResponse);
         } else {
             var resolvedJwt = resolveToken(httpServletRequest);
 
-            if (Objects.nonNull(resolvedJwt) && this.tokenProvider.validateToken(resolvedJwt)) {
-                Authentication authentication = this.tokenProvider.getAuthentication(resolvedJwt);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (Objects.nonNull(resolvedJwt) && validateToken(resolvedJwt)) {
+                SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+                var token = jwtAuthenticationConverter.convert(jwtDecoder.decode(resolvedJwt));
+                token.setAuthenticated(true);
+
+                securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(
+                        token.getPrincipal(), token.getCredentials()
+                    )
+                );
+                SecurityContextHolder.setContext(securityContext);
             }
+
             filterChain.doFilter(servletRequest, servletResponse);
+        }
+    }
+
+    boolean validateToken(String token) {
+        try {
+            jwtDecoder.decode(token);
+            return true;
+        } catch (Exception e) {
+            if (e.getMessage().contains("Invalid signature")) {
+                metersService.trackTokenInvalidSignature();
+            } else if (e.getMessage().contains("Jwt expired at")) {
+                metersService.trackTokenExpired();
+            } else if (e.getMessage().contains("Invalid JWT serialization")) {
+                metersService.trackTokenMalformed();
+            } else if (e.getMessage().contains("Invalid unsecured/JWS/JWE")) {
+                metersService.trackTokenMalformed();
+            }
+            throw e;
         }
     }
 
@@ -59,7 +98,7 @@ public class JWTFilter extends GenericFilterBean {
      * @param httpServletRequest
      * @return boolean
      */
-    private boolean checkedHttpOptionsHeaderFromRequest(HttpServletRequest httpServletRequest) {
+    boolean checkedHttpOptionsHeaderFromRequest(HttpServletRequest httpServletRequest) {
         return (
             HttpMethod.OPTIONS.matches(httpServletRequest.getMethod()) &&
                 (

@@ -2,6 +2,7 @@ package br.com.gpds.web.rest.errors;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponseException;
@@ -12,6 +13,7 @@ import tech.jhipster.web.rest.errors.ProblemDetailWithCause.ProblemDetailWithCau
 public class BadRequestAlertException extends ErrorResponseException {
 
     private static final long serialVersionUID = 1L;
+    public static final String DEFAULT_ERROR_KEY_SUFFIX = "Erro: ";
 
     private final String entityName;
 
@@ -29,7 +31,7 @@ public class BadRequestAlertException extends ErrorResponseException {
                 .withStatus(HttpStatus.BAD_REQUEST.value())
                 .withType(type)
                 .withTitle(defaultMessage)
-                .withProperty("message", "error." + errorKey)
+                .withProperty("message", DEFAULT_ERROR_KEY_SUFFIX + errorKey)
                 .withProperty("params", entityName)
                 .build(),
             null
@@ -52,7 +54,7 @@ public class BadRequestAlertException extends ErrorResponseException {
 
     private static Map<String, Object> getAlertParameters(String entityName, String errorKey) {
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("message", "error." + errorKey);
+        parameters.put("message", DEFAULT_ERROR_KEY_SUFFIX + errorKey);
         parameters.put("params", entityName);
         return parameters;
     }

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
  * REST controller for managing testing authentication token.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/test/api")
 public class TestAuthenticationResource {
 
     /**

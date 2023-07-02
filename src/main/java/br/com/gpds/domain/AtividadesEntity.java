@@ -1,26 +1,50 @@
 package br.com.gpds.domain;
 
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
-@Table(name = "atividades", schema = "ag_cap_gpds", catalog = "GPDS")
+@Table(name = "atividades", schema = "ag_cap_gpds")
+@JsonRootName("Activities")
 public class AtividadesEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long id;
     @Basic
     @Column(name = "descricao")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("description")
     private String descricao;
     @Basic
     @Column(name = "percentagem")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("percentage")
     private BigDecimal percentagem;
     @ManyToOne
     @JoinColumn(name = "status", referencedColumnName = "id")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private StatusEntity status;
+
+    public AtividadesEntity() {
+    }
+
+    public AtividadesEntity(String descricao, BigDecimal percentagem, StatusEntity status) {
+        this.descricao = descricao;
+        this.percentagem = percentagem;
+        this.status = status;
+    }
+
+    public AtividadesEntity(Long id, String descricao, BigDecimal percentagem, StatusEntity status) {
+        this.id = id;
+        this.descricao = descricao;
+        this.percentagem = percentagem;
+        this.status = status;
+    }
 
     public Long getId() {
         return id;

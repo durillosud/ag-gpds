@@ -1,8 +1,6 @@
 package br.com.gpds.config;
 
-import br.com.gpds.security.*;
-import br.com.gpds.security.jwt.JWTConfigurer;
-import br.com.gpds.security.jwt.TokenProvider;
+import br.com.gpds.security.AuthoritiesConstants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,11 +19,9 @@ import tech.jhipster.config.JHipsterProperties;
 public class SecurityConfiguration {
 
     private final JHipsterProperties jHipsterProperties;
-    private final TokenProvider tokenProvider;
 
-    public SecurityConfiguration(JHipsterProperties jHipsterProperties, TokenProvider tokenProvider) {
+    public SecurityConfiguration(JHipsterProperties jHipsterProperties) {
         this.jHipsterProperties = jHipsterProperties;
-        this.tokenProvider = tokenProvider;
     }
 
     @Bean
@@ -47,6 +43,7 @@ public class SecurityConfiguration {
                 authz
                     .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/authenticate").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/authenticate/dummy-user").permitAll()
                     .requestMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers("/api/**").authenticated()
 //                    .requestMatchers("/v3/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)
@@ -62,12 +59,8 @@ public class SecurityConfiguration {
                     .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
                     .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
             )
-            .apply(securityConfigurerAdapter());
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt());
         return http.build();
         // @formatter:on
-    }
-
-    private JWTConfigurer securityConfigurerAdapter() {
-        return new JWTConfigurer(tokenProvider);
     }
 }

@@ -1,11 +1,13 @@
 package br.com.gpds.domain;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import jakarta.persistence.*;
 
 import java.util.Objects;
 
 @Entity
-@Table(name = "atividade_projeto_cliente", schema = "ag_cap_gpds", catalog = "GPDS")
+@Table(name = "atividade_projeto_cliente", schema = "ag_cap_gpds")
+@JsonRootName("ActivitiesAndProjectsFromCustomer")
 public class AtividadeProjetoClienteEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -18,8 +20,17 @@ public class AtividadeProjetoClienteEntity {
     @JoinColumn(name = "projeto", referencedColumnName = "id", nullable = false)
     private ProjetosEntity projeto;
     @ManyToOne
-    @JoinColumn(name = "atividade", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "atividade", referencedColumnName = "id")
     private AtividadesEntity atividade;
+
+    public AtividadeProjetoClienteEntity() {
+    }
+
+    public AtividadeProjetoClienteEntity(ClientesEntity cliente, ProjetosEntity projeto, AtividadesEntity atividade) {
+        this.cliente = cliente;
+        this.projeto = projeto;
+        this.atividade = atividade;
+    }
 
     public Long getId() {
         return id;

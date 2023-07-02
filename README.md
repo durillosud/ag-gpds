@@ -7,7 +7,17 @@ This application is configured for Service Discovery and Configuration with . On
 
 ## Getting Started
 
-For simplicity and convenience, here we  
+Para iniciar o banco de dados PostgreSql rode o comando.
+
+```shell
+make start-db
+``` 
+
+Para parar o container do DB.
+
+```shell
+make stop-db
+```
 
 ## Project Structure
 

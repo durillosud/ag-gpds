@@ -1,6 +1,7 @@
 package br.com.gpds.security.jwt;
 
 import br.com.gpds.config.SecurityConfiguration;
+import br.com.gpds.config.SecurityConfigurationTest;
 import br.com.gpds.config.SecurityJwtConfiguration;
 import br.com.gpds.config.WebConfigurer;
 import br.com.gpds.management.SecurityMetersService;
@@ -18,7 +19,7 @@ import tech.jhipster.config.JHipsterProperties;
     classes = {
         JHipsterProperties.class,
         WebConfigurer.class,
-        SecurityConfiguration.class,
+        SecurityConfigurationTest.class,
         SecurityJwtConfiguration.class,
         SecurityMetersService.class,
         JwtAuthenticationTestUtils.class,
