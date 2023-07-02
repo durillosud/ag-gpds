@@ -12,10 +12,10 @@ public class WebResourceUtilsTest {
     @Test
     @DisplayName("Should return descending order when order field is not empty and direction is descending")
     void getOrdersWhenOrderFieldIsNotEmptyAndDirectionIsDescending() {
-        String orderField = "name";
-        String order = "desc";
+        var orderField = "name";
+        var order = "desc";
 
-        Sort result = WebResourceUtils.getOrdersWhenOrderFieldIsNotEmpty(orderField, order);
+        var result = WebResourceUtils.getOrdersWhenOrderFieldIsNotEmpty(orderField, order);
 
         assertNotNull(result);
         assertEquals(Sort.Direction.DESC, result.getOrderFor(orderField).getDirection());
@@ -24,10 +24,10 @@ public class WebResourceUtilsTest {
     @Test
     @DisplayName("Should return ascending order when order field is not empty and direction is ascending")
     void getOrdersWhenOrderFieldIsNotEmptyAndDirectionIsAscending() {
-        String orderField = "name";
-        String order = "asc";
+        var orderField = "name";
+        var order = "asc";
 
-        Sort result = WebResourceUtils.getOrdersWhenOrderFieldIsNotEmpty(orderField, order);
+        var result = WebResourceUtils.getOrdersWhenOrderFieldIsNotEmpty(orderField, order);
 
         assertNotNull(result);
         assertEquals(Sort.Direction.ASC, result.getOrderFor(orderField).getDirection());

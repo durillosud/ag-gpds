@@ -72,7 +72,7 @@ jhipster:
         base64-secret: NTRjZmMxYzhlZDEzNjMwNmI0NGI4MzQ0N2VhYjM4YmVjYTdjYWNkNTA0OTViODY0Y2M2OTZiMzFiNzI3YmE4MGM1ZDZkMTdkYmVmOGIxNjcxODllMDRiZjgxYWMyMGQ5MjM5MTc1ZTBlNjFiYTJlMTVjMDRlYzhlOTAzNmMyNzU=
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
-        token-validity-in-seconds-for-remember-me: 86400
+        token-validity-in-seconds-for-remember-me: 2592000
 
 # ===================================================================
 # Application specific properties

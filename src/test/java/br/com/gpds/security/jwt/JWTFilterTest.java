@@ -1,7 +1,6 @@
 package br.com.gpds.security.jwt;
 
 import br.com.gpds.management.SecurityMetersService;
-import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,11 +21,9 @@ public class JWTFilterTest {
     private JwtDecoder jwtDecoder;
     private SecurityMetersService securityMetersService;
     private JwtAuthenticationConverter jwtAuthenticationConverter;
-    private MeterRegistry meterRegistry;
 
     @BeforeEach
     void setUp() {
-//        meterRegistry = mock(MeterRegistry.class);
         securityMetersService = mock(SecurityMetersService.class);
         jwtDecoder = mock(JwtDecoder.class);
         jwtAuthenticationConverter = mock(JwtAuthenticationConverter.class);
@@ -37,7 +34,7 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should throw an exception when the token is unsecured/JWS/JWE")
     void validateTokenWhenTokenIsUnsecuredJwsJweThenThrowException() {
-        String token = "invalidToken";
+        var token = "invalidToken";
 
         when(jwtDecoder.decode(token)).thenThrow(new RuntimeException("Invalid unsecured/JWS/JWE"));
 
@@ -48,7 +45,7 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should throw an exception when the token has an invalid signature")
     void validateTokenWhenSignatureIsInvalidThenThrowException() {
-        String invalidToken = "invalidToken";
+        var invalidToken = "invalidToken";
 
         when(jwtDecoder.decode(invalidToken)).thenThrow(new RuntimeException("Invalid signature"));
 
@@ -59,7 +56,7 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should throw an exception when the token is expired")
     void validateTokenWhenTokenIsExpiredThenThrowException() {
-        String expiredToken = "expiredToken";
+        var expiredToken = "expiredToken";
 
         when(jwtDecoder.decode(expiredToken)).thenThrow(new JwtException("Token expired"));
 
@@ -69,7 +66,7 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should validate the token when it is valid")
     void validateTokenWhenItIsValid() {
-        String validToken = "validToken";
+        var validToken = "validToken";
 
         when(jwtDecoder.decode(validToken)).thenReturn(mock(Jwt.class));
 
@@ -83,7 +80,7 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should throw an exception when the token is malformed")
     void validateTokenWhenTokenIsMalformedThenThrowException() {
-        String malformedToken = "invalid_token";
+        var malformedToken = "invalid_token";
 
         when(jwtDecoder.decode(malformedToken)).thenThrow(new RuntimeException("Invalid JWT serialization"));
 
@@ -94,7 +91,7 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should return false when the HTTP method is not OPTIONS")
     void checkedHttpOptionsHeaderFromRequestWhenMethodIsNotOptions() {
-        HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+        var httpServletRequest = mock(HttpServletRequest.class);
         when(httpServletRequest.getMethod()).thenReturn("GET");
 
         boolean result = jwtFilter.checkedHttpOptionsHeaderFromRequest(httpServletRequest);
@@ -105,16 +102,16 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should return true when the HTTP method is OPTIONS and the request headers contain either SESSION_KEY or AUTHORIZATION")
     void checkedHttpOptionsHeaderFromRequestWhenMethodIsOptionsAndHeadersContainSessionKeyOrAuthorization() {
-        HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
+        var httpServletRequest = mock(HttpServletRequest.class);
         when(httpServletRequest.getMethod()).thenReturn("OPTIONS");
 
-        String sessionKeyHeader = "X-SessionKey";
-        String authorizationHeader = "Authorization";
+        var sessionKeyHeader = "X-SessionKey";
+        var authorizationHeader = "Authorization";
 
         when(httpServletRequest.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS))
             .thenReturn(sessionKeyHeader + ", " + authorizationHeader);
 
-        boolean result = jwtFilter.checkedHttpOptionsHeaderFromRequest(httpServletRequest);
+        var result = jwtFilter.checkedHttpOptionsHeaderFromRequest(httpServletRequest);
 
         assertTrue(result);
         verify(httpServletRequest, times(1)).getMethod();
@@ -124,10 +121,10 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should return null when the Authorization header does not start with 'Bearer '")
     void resolveTokenWhenAuthorizationHeaderDoesNotStartWithBearer() {
-        HttpServletRequest request = mock(HttpServletRequest.class);
+        var request = mock(HttpServletRequest.class);
         when(request.getHeader("Authorization")).thenReturn("Token abc123");
 
-        String token = ReflectionTestUtils.invokeMethod(jwtFilter, "resolveToken", request);
+        var token = ReflectionTestUtils.invokeMethod(jwtFilter, "resolveToken", request);
 
         assertNull(token);
     }
@@ -135,10 +132,10 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should return the token when the Authorization header starts with 'Bearer ' and is not empty")
     void resolveTokenWhenAuthorizationHeaderStartsWithBearerAndIsNotEmpty() {
-        HttpServletRequest request = mock(HttpServletRequest.class);
+        var request = mock(HttpServletRequest.class);
         when(request.getHeader("Authorization")).thenReturn("Bearer token");
 
-        String token = (String) ReflectionTestUtils.invokeMethod(jwtFilter, "resolveToken", request);
+        var token = (String) ReflectionTestUtils.invokeMethod(jwtFilter, "resolveToken", request);
 
         assertEquals("token", token);
     }
@@ -146,7 +143,7 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should track invalid signature and throw exception when the token has invalid signature")
     void validateTokenWhenTokenHasInvalidSignatureThenTrackAndThrowException() {
-        String invalidToken = "invalidToken";
+        var invalidToken = "invalidToken";
 
         when(jwtDecoder.decode(invalidToken)).thenThrow(new RuntimeException("Invalid signature"));
 
@@ -158,7 +155,7 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should track token malformed and throw exception when the token is unsecured/JWS/JWE")
     void validateTokenWhenTokenIsUnsecuredJwsJweThenTrackAndThrowException() {
-        String token = "invalid_token";
+        var token = "invalid_token";
 
         when(jwtDecoder.decode(token)).thenThrow(new RuntimeException("Invalid unsecured/JWS/JWE"));
 
@@ -169,7 +166,7 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should track token expired and throw exception when the token is expired")
     void validateTokenWhenTokenIsExpiredThenTrackAndThrowException() {
-        String expiredToken = "expired_token";
+        var expiredToken = "expired_token";
 
         when(jwtDecoder.decode(expiredToken)).thenThrow(new RuntimeException("Jwt expired at"));
 
@@ -181,7 +178,8 @@ public class JWTFilterTest {
     @Test
     @DisplayName("Should track token malformed and throw exception when the token is malformed")
     void validateTokenWhenTokenIsMalformedThenTrackAndThrowException() {
-        String malformedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+        var malformedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" +
+            ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
 
         when(jwtDecoder.decode(malformedToken)).thenThrow(new RuntimeException("Invalid JWT serialization"));
 

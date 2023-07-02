@@ -21,11 +21,11 @@ public class AuthorizationResource {
         this.dummyAuthorizationService = dummyAuthorizationService;
     }
 
-    @GetMapping
+    @GetMapping("dummy-user")
     @Operation(
         summary = "Obtém um Json Web Token para um usuário anônimo",
         description =
-            "Obtém um Json Web Token para um usuário `fictício`,  `anônimo`",
+            "Obtém um Json Web Token para um usuário `anônimo fictício`",
         operationId = "getJsonWebTokenForDummyUser",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK")

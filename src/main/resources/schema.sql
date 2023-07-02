@@ -103,17 +103,18 @@ comment on table ag_cap_gpds.atividade_projeto_cliente is 'Contém a associaçã
 -- alter table ag_cap_gpds.atividade_projeto_cliente
 --     owner to gpds;
 
-insert into ag_cap_gpds.status (id, descricao)
-values (default, 'Em análise'),
-       (default, 'Em implementação'),
-       (default, 'Em implantação'),
-       (default, 'Em suporte'),
-       (default, 'Finalizado');
+insert into ag_cap_gpds.status (descricao)
+values ('Em análise'),
+       ('Em implementação'),
+       ('Em implantação'),
+       ('Em suporte'),
+       ('Iniciado(a)'),
+       ('Finalizado(a)');
 
-insert into ag_cap_gpds.time (nome, id)
-values ('Time 1', default),
-       ('Time 2', default),
-       ('Time 3', default);
+insert into ag_cap_gpds.time (nome)
+values ('Time 1'),
+       ('Time 2'),
+       ('Time 3');
 
 
 -- Sample data
@@ -126,6 +127,27 @@ values  ('Manuel Julio Kevin Oliveira'),
         ('Natália Jaqueline Silva'),
         ('Marcos Anderson Elias Teixeira'),
         ('Arthur Guilherme dos Santos');
+
+insert into ag_cap_gpds.atividades (descricao, status, percentagem)
+values  ('Celebração de Contrato', 5, 0.0),
+        ('Celebração de Contrato', 5, 0.0),
+        ('Celebração de Contrato', 5, 0.0),
+        ('Celebração de Contrato', 5, 0.0),
+        ('Celebração de Contrato', 5, 0.0);
+
+insert into ag_cap_gpds.projetos (descricao, status, time)
+values  ('MenelalAI', 1, 3),
+        ('SignallSys', 1, 1),
+        ('WayTI', 1, 1),
+        ('Cargo3', 1, 2),
+        ('WayTI', 1, 1);
+
+insert into ag_cap_gpds.atividade_projeto_cliente (cliente, projeto, atividade)
+values  (5, 1, 1),
+        (3, 2, 2),
+        (7, 3, 3),
+        (5, 5, 5),
+        (4, 4, 4);
 --============================================================
 --
 -- create schema if not exists ag_cap_gpds;

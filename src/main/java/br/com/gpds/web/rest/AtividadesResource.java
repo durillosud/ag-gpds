@@ -1,12 +1,10 @@
 package br.com.gpds.web.rest;
 
-
-import br.com.gpds.domain.ClientesEntity;
 import br.com.gpds.domain.common.DomainConstants;
-import br.com.gpds.domain.query.filter.ClientesFilter;
-import br.com.gpds.domain.request.CustomerRequest;
-import br.com.gpds.domain.response.CustomerResponse;
-import br.com.gpds.service.ClientesService;
+import br.com.gpds.domain.request.ActivityCreateRequest;
+import br.com.gpds.domain.request.ActivityUpdateRequest;
+import br.com.gpds.domain.response.ActivityResponse;
+import br.com.gpds.service.AtividadesService;
 import br.com.gpds.web.rest.errors.BadRequestAlertException;
 import br.com.gpds.web.utils.WebResourceUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,33 +31,34 @@ import java.util.Optional;
 @RestController
 @RequestMapping(DomainConstants.APP_PATH)
 @Validated
-public class ClientesResource {
+public class AtividadesResource {
+    private final AtividadesService atividadesService;
 
-    private final ClientesService clientesService;
-
-    public ClientesResource(ClientesService clientesService) {
-        this.clientesService = clientesService;
+    public AtividadesResource(AtividadesService atividadesService) {
+        this.atividadesService = atividadesService;
     }
 
-    @GetMapping(value = DomainConstants.CUSTOMERS + "listar", produces = {"application/json"})
+    @GetMapping(value = DomainConstants.ACTIVITIES + "por-status/{statusId}/listar", produces = {"application/json"})
     @Operation(
-        summary = "Lista paginada com clientes",
+        summary = "Lista paginada de atividades de projetos de clientes, por estado",
         description =
-            "Lista paginada com clientes:<br/>" +
-                "<ul><li>filtro por `nome`;</li><br/>" +
-                "<li>paginação `nº da página (page)`, `tamanho da página (pageSize)`, " +
+            "Lista paginada de atividades de por projetos por estado:<br/>" +
+                "<ul><li>paginação `nº da página (page)`, `tamanho da página (pageSize)`, " +
                 "`tipo de ordenação (order), exemplo [asc, desc]`;" +
                 "</li></ul>",
-        operationId = "getCustomersFilteredAndSortedAndPaginated",
+        operationId = "getActivitiesByStatusIdAndCustomerIdSortedAndPaginated",
         security = @SecurityRequirement(name = "bearerAuth"),
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "204", description = "No Content"),
             @ApiResponse(responseCode = "400", description = "Bad Request"),
         }
     )
-    public Page<ClientesEntity> getCustomersFilteredAndSortedAndPaginated(
-        @Parameter(description = "Nome do cliente")
-        @RequestParam(required = false, defaultValue = "") String name,
+    public Page<ActivityResponse> getActivitiesByStatusIdAndCustomerIdSortedAndPaginated(
+        @Parameter(description = "Identificador do `status` da atividade do projeto")
+        @PathVariable("statusId") Long statusId,
+        @Parameter(description = "Identificador do Product Owner relativo à atividade do projeto")
+        @RequestParam(value = "customerId", required = false) Long customerId,
         @Parameter(description = "Número da página")
         @RequestParam(required = false, defaultValue = "0") int page,
         @Parameter(description = "Quantidade de itens por página")
@@ -67,26 +66,42 @@ public class ClientesResource {
         @Parameter(description = "Tipo de ordenação", schema = @Schema(format = "enum"))
         @RequestParam(required = false, defaultValue = "asc") String order,
         HttpServletRequest request,
-        HttpServletResponse response
+        final HttpServletResponse response
     ) throws ErrorResponseException {
         try {
             var header = request.getHeader(HttpHeaders.AUTHORIZATION);
-            var sort = name.isEmpty() ? Sort.unsorted() : WebResourceUtils.getOrdersWhenOrderFieldIsNotEmpty(name, order);
+            var orderField = atividadesService.getStatusDescriptionById(statusId);
+            var sort = orderField.isEmpty()
+                ? Sort.unsorted()
+                : WebResourceUtils.getOrdersWhenOrderFieldIsNotEmpty(orderField, order);
 
-            return clientesService.getCustomersFilteredAndSortedAndPaginated(
-                new ClientesFilter(null, name), PageRequest.of(page, pageSize, sort)
+            customerId = getNullableCustomerId(customerId);
+
+            var activityResponse = atividadesService.getActivitiesByStatusIdAndCustomerIdPaginated(
+                statusId, Optional.ofNullable(customerId), PageRequest.of(page, pageSize, sort)
             );
-        } catch (BadRequestAlertException e) {
-            throw new BadRequestAlertException(e.getMessage(), getClass().getName(), e.getDetailMessageCode());
+
+            if (!activityResponse.hasContent()) {
+                response.setStatus(HttpStatus.NO_CONTENT.value());
+            }
+
+            return activityResponse;
+        } catch (RuntimeException e) {
+            throw new BadRequestAlertException(e.getMessage(), getClass().getName(), e.getLocalizedMessage());
         }
     }
 
-    @PostMapping(value = DomainConstants.CUSTOMER + "criar", produces = {"application/json"})
+    private static Long getNullableCustomerId(Long customerId) {
+        customerId = 0L == customerId ? null : customerId;
+        return customerId;
+    }
+
+    @PostMapping(value = DomainConstants.ACTIVITY + "criar", produces = {"application/json"})
     @Operation(
-        summary = "Salva um novo cliente na base de dados",
+        summary = "Salva uma nova atividade para um projeto de um cliente na base de dados",
         description =
-            "Tenta salvar um novo cliente na base de dados",
-        operationId = "saveCustomer",
+            "Tenta salvar uma nova atividade para um projeto de um cliente na base de dados",
+        operationId = "saveActivity",
         security = @SecurityRequirement(name = "bearerAuth"),
         responses = {
             @ApiResponse(responseCode = "201", description = "Created"),
@@ -94,36 +109,33 @@ public class ClientesResource {
             @ApiResponse(responseCode = "500", description = "Internal Server Error"),
         }
     )
-    public ClientesEntity saveCustomer(
-        @RequestBody @Valid CustomerRequest customerRequest,
+    public ActivityResponse saveActivity(
+        @RequestBody @Valid ActivityCreateRequest activityCreateRequest,
         HttpServletRequest request,
         HttpServletResponse response
     ) throws ErrorResponseException {
         try {
             var header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-            var savedCustomer = clientesService.save(
-                new CustomerRequest(null, customerRequest.name())
-            );
-            Optional.ofNullable(savedCustomer)
-                .flatMap(clientesEntity -> Optional.ofNullable(clientesEntity.getId()))
-                .ifPresentOrElse(
-                    aLong -> response.setStatus(HttpStatus.CREATED.value()),
-                    () -> response.setStatus(HttpStatus.NOT_MODIFIED.value())
-                );
+            response.setStatus(HttpStatus.NOT_MODIFIED.value());
 
-            return savedCustomer;
+            var activityResponse = atividadesService.save(
+                activityCreateRequest
+            );
+            response.setStatus(HttpStatus.CREATED.value());
+
+            return activityResponse;
         } catch (RuntimeException e) {
             throw new BadRequestAlertException(e.getMessage(), getClass().getName(), e.getLocalizedMessage());
         }
     }
 
-    @PostMapping(value = DomainConstants.CUSTOMER + "atualizar", produces = {"application/json"})
+    @PostMapping(value = DomainConstants.ACTIVITY + "atualizar", produces = {"application/json"})
     @Operation(
-        summary = "Atualiza os dados de um cliente na base de dados",
+        summary = "Atualiza os dados de uma atividade de projeto de desenvolvimento na base de dados",
         description =
-            "Tenta atualizar os dados de um cliente na base de dados",
-        operationId = "updateCustomer",
+            "Tenta atualizar os dados de uma atividade de um projeto de desenvolvimento na base de dados",
+        operationId = "updateActivity",
         security = @SecurityRequirement(name = "bearerAuth"),
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -131,26 +143,26 @@ public class ClientesResource {
             @ApiResponse(responseCode = "500", description = "Internal Server Error"),
         }
     )
-    public ClientesEntity updateCustomer(
-        @RequestBody @Valid CustomerRequest customerRequest,
+    public ActivityResponse updateActivity(
+        @RequestBody @Valid ActivityUpdateRequest activityUpdateRequest,
         HttpServletRequest request,
         HttpServletResponse response
     ) {
         try {
             var header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-            return clientesService.update(customerRequest);
+            return atividadesService.update(activityUpdateRequest);
         } catch (RuntimeException e) {
             throw new BadRequestAlertException(e.getMessage(), getClass().getName(), e.getLocalizedMessage());
         }
     }
 
-    @PostMapping(value = DomainConstants.CUSTOMER + "{id}/deletar", produces = {"application/json"})
+    @PostMapping(value = DomainConstants.ACTIVITY + "{id}/deletar", produces = {"application/json"})
     @Operation(
-        summary = "Apaga os dados de um cliente da base de dados",
+        summary = "Apaga os dados de uma atividade de um projeto de um cliente da base de dados",
         description =
-            "Tenta apagar os dados de um cliente da base de dados",
-        operationId = "deleteCustomer",
+            "Tenta apagar os dados de uma atividade de um projeto de um cliente da base de dados",
+        operationId = "deleteActivity",
         security = @SecurityRequirement(name = "bearerAuth"),
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
@@ -158,8 +170,8 @@ public class ClientesResource {
             @ApiResponse(responseCode = "500", description = "Internal Server Error"),
         }
     )
-    public CustomerResponse deleteCustomer(
-        @PathVariable("id"  )
+    public ActivityResponse deleteActivity(
+        @PathVariable("id")
         @NotNull(message = "O parâmetro não pode ser nulo")
         @Min(value = 1, message = "O parâmetro deve ser maior que zero") Long id,
         HttpServletRequest request,
@@ -168,9 +180,9 @@ public class ClientesResource {
         try {
             var header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-            return clientesService.delete(id);
+            return atividadesService.delete(id);
         } catch (RuntimeException e) {
-            throw new BadRequestAlertException(e.getMessage(), getClass().getName(), e.getLocalizedMessage());
+            throw new BadRequestAlertException(e.getMessage(), getClass().getName(), e.getMessage());
         }
     }
 }

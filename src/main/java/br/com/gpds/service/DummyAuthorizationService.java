@@ -1,6 +1,7 @@
 package br.com.gpds.service;
 
 import br.com.gpds.domain.response.JwtResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -19,17 +20,13 @@ import static br.com.gpds.security.SecurityUtils.JWT_ALGORITHM;
 public class DummyAuthorizationService {
 
     private final JwtEncoder jwtEncoder;
-    private final JHipsterProperties jHipsterProperties;
-    private final long tokenValidityInMilliseconds;
-    private final long tokenValidityInMillisecondsForRememberMe;
+    @Value("${jhipster.security.authentication.jwt.token-validity-in-seconds}")
+    private long tokenValidityInMilliseconds;
+    @Value("${jhipster.security.authentication.jwt.token-validity-in-seconds-for-remember-me}")
+    private long tokenValidityInMillisecondsForRememberMe;
 
-    public DummyAuthorizationService(JwtEncoder jwtEncoder, JHipsterProperties jHipsterProperties) {
+    public DummyAuthorizationService(JwtEncoder jwtEncoder) {
         this.jwtEncoder = jwtEncoder;
-        this.jHipsterProperties = jHipsterProperties;
-
-        this.tokenValidityInMilliseconds = 1000 * jHipsterProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSeconds();
-        this.tokenValidityInMillisecondsForRememberMe =
-            1000 * jHipsterProperties.getSecurity().getAuthentication().getJwt().getTokenValidityInSecondsForRememberMe();
     }
 
     public JwtResponse getJwtForDummyUser(boolean rememberMe) {
@@ -37,9 +34,9 @@ public class DummyAuthorizationService {
 
         var validity = Instant.now();
         if (rememberMe) {
-            validity = validity.plusMillis(this.tokenValidityInMillisecondsForRememberMe);
+            validity = validity.plusMillis(1000 * this.tokenValidityInMillisecondsForRememberMe);
         } else {
-            validity = validity.plusMillis(this.tokenValidityInMilliseconds);
+            validity = validity.plusMillis(1000 * this.tokenValidityInMilliseconds);
         }
 
         var claims = JwtClaimsSet
@@ -57,6 +54,10 @@ public class DummyAuthorizationService {
         );
     }
 
+    public void setTokenValidityInMilliseconds(long tokenValidityInMilliseconds) {
+        this.tokenValidityInMilliseconds = tokenValidityInMilliseconds;
+    }
+
     public long getTokenValidityInMilliseconds() {
         return tokenValidityInMilliseconds;
     }
@@ -65,11 +66,7 @@ public class DummyAuthorizationService {
         return tokenValidityInMillisecondsForRememberMe;
     }
 
-    public JwtEncoder getJwtEncoder() {
-        return jwtEncoder;
-    }
-
-    public JHipsterProperties getjHipsterProperties() {
-        return jHipsterProperties;
+    public void setTokenValidityInMillisecondsForRememberMe(long tokenValidityInMillisecondsForRememberMe) {
+        this.tokenValidityInMillisecondsForRememberMe = tokenValidityInMillisecondsForRememberMe;
     }
 }

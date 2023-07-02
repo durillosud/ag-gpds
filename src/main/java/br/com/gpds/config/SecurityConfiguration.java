@@ -43,6 +43,7 @@ public class SecurityConfiguration {
                 authz
                     .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/authenticate").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/authenticate/dummy-user").permitAll()
                     .requestMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers("/api/**").authenticated()
 //                    .requestMatchers("/v3/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)
