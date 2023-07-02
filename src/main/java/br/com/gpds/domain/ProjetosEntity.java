@@ -61,6 +61,11 @@ public class ProjetosEntity {
         this.time = time;
     }
 
+    public ProjetosEntity(long id, String descricao) {
+        this.id = id;
+        this.descricao = descricao;
+    }
+
     public long getId() {
         return id;
     }

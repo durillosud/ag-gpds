@@ -32,7 +32,9 @@ public class AtividadesService {
         AtividadesRepository atividadesRepository,
         StatusRepository statusRepository,
         ClientesRepository clientesRepository,
-        AtividadeProjetoClienteRepository atividadeProjetoClienteRepository, ProjetosRepository projetosRepository) {
+        AtividadeProjetoClienteRepository atividadeProjetoClienteRepository,
+        ProjetosRepository projetosRepository
+    ) {
         this.atividadesRepository = atividadesRepository;
         this.statusRepository = statusRepository;
         this.clientesRepository = clientesRepository;

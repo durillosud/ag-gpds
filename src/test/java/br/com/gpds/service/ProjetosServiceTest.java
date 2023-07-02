@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,17 +45,20 @@ class ProjetosServiceTest {
     @Mock
     private TimeRepository timeRepository;
 
+    @InjectMocks
     private ProjetosService projetosService;
 
     @BeforeEach
     void setUp() {
         try (var mocks = MockitoAnnotations.openMocks(this)) {
-            projetosService = new ProjetosService(projetosRepository,
+            projetosService = new ProjetosService(
+                projetosRepository,
                 clientesRepository,
                 atividadesRepository,
                 atividadeProjetoClienteRepository,
                 statusRepository,
-                timeRepository);
+                timeRepository
+            );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
